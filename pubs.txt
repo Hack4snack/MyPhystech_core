@@ -1,0 +1,25 @@
+126083726 Фонд целевого капитала МФТИ
+1694 ФУПМ МФТИ
+53380416 ФБМФ МФТИ
+166330483 ФПМИ МФТИ
+26085 MIPT_Opf
+17906 ФАКИ МФТИ
+17708 ФРКТ МФТИ
+15787 ФМХФ МФТИ
+35717 ФПФЭ МФТИ
+39203 ФФКЭ МФТИ
+26356004 Поток
+932 MIPT_Phystech
+73965718 MIPT_Today
+7218416 MIPT_Union
+60098643 Культурный физтех
+160873875 MIPT_CultureReboot
+43281341 MIPT_CenterCariery
+161664433 MIPT_Start
+35555742 MIPT_CasesClub
+62285932 MIPT_Trips
+7984081 MIPT_Profkom
+87263485 MIPT_Overgraduate
+91638353 MIPT_SoftSkills
+33113779 MIPT_Mki
+129056835 MIPT_intership
