@@ -80,7 +80,34 @@ topic_id2tag = {
     98: '', 99: '',
 }
 
+def get_date(string, date_to_replace_year):
+    parsed_string = dates_extractor(string)
+    if parsed_string:
+        if 'month' in parsed_string[0].fact.as_json.keys() and 'day' in parsed_string[0].fact.as_json.keys():
+            if 'year' in parsed_string[0].fact.as_json.keys():
+                try:
+                    return datetime(
+                        year=parsed_string[0].fact.as_json['year'],
+                        month=parsed_string[0].fact.as_json['month'],
+                        day=parsed_string[0].fact.as_json['day']
+                    )
+                except:
+                    return None
+            else:
+                try:
+                    return datetime(
+                        year=2020, month=parsed_string[0].fact.as_json['month'],
+                        day=parsed_string[0].fact.as_json['day']
+                    )
+                except:
+                    return None
+        else:
+            return None
+    else:
+        return None
+
 def get_location(text):
+    # TODO
     if re.search('[1-5]\\d\\d ([Гг]лавно|ГК)', text):
         return re.search('[1-5]\\d\\d', text).group(0) + ' ГК'
     if re.search('[1-5]\\d\\d ЛК', text):
@@ -99,6 +126,11 @@ def get_location(text):
         return 'фойе КЗ'
     elif 'Концертн' in text:
         return 'КЗ'
+
+def get_pubs():
+    with open('data/pubs.txt', "r") as f:
+        data = f.read().split("\n")
+    return data
 
 def probs2tags(probs):
     tags = []
@@ -145,32 +177,6 @@ def _to_vw_format(doc_index, document, bigramm):
             )
         )
 
-def get_date(string, date_to_replace_year):
-    parsed_string = dates_extractor(string)
-    if parsed_string:
-        if 'month' in parsed_string[0].fact.as_json.keys() and 'day' in parsed_string[0].fact.as_json.keys():
-            if 'year' in parsed_string[0].fact.as_json.keys():
-                try:
-                    return datetime(
-                        year=parsed_string[0].fact.as_json['year'],
-                        month=parsed_string[0].fact.as_json['month'],
-                        day=parsed_string[0].fact.as_json['day']
-                    )
-                except:
-                    return None
-            else:
-                try:
-                    return datetime(
-                        year=2020, month=parsed_string[0].fact.as_json['month'],
-                        day=parsed_string[0].fact.as_json['day']
-                    )
-                except:
-                    return None
-        else:
-            return None
-    else:
-        return None
-
 def add_standard_scores(model, dictionary, modalities=("@raw_text", '@origin')):
     model.scores.add(
         artm.scores.SparsityThetaScore(name='theta_sparsity')
@@ -211,7 +217,6 @@ def create_model(num_topics, dictionary, origin=100000, bigramm=5, verbose=True,
             modalities=['@raw_text']
 
     model = artm.ARTM(
-        # num_processors=12,
         topic_names=['topic {}'.format(i) for i in range(num_topics)],
         theta_columns_naming = 'title',
         show_progress_bars=verbose,
@@ -219,62 +224,10 @@ def create_model(num_topics, dictionary, origin=100000, bigramm=5, verbose=True,
         class_ids=class_ids,
         seed=seed
     )
-#     if origin:
     add_standard_scores(model, dictionary, modalities)
-#     else:
-#         add_standard_scores(model, dictionary, modalities=["@raw_text"])
     model.initialize(dictionary)
 
     return model
-
-def plot_perp_and_sparsity(model, modality='@raw_text', use_first_perp=False):
-    # TODO: add purity and contrast
-    # https://matplotlib.org/gallery/api/two_scales.html
-
-    f = plt.figure(figsize=(12,5))
-    ax1 = f.add_subplot(121)
-    ax2 = f.add_subplot(122)
-    if use_first_perp:
-        ax1.plot(model.score_tracker["perplexity_{}".format(modality)].value)
-    else:
-        ax1.plot(range(1, model.num_phi_updates),
-                 model.score_tracker["perplexity_{}".format(modality)].value[1:])
-    ax1.set_title('perplexity')
-    ax1.grid()
-    ax2.plot(model.score_tracker["theta_sparsity"].value, label='$\\Theta$')
-    ax2.plot(model.score_tracker["phi_{}_sparsity".format(modality)].value, label='$\\Phi$')
-    ax2.set_title('$\\Phi$ and $\\Theta$ sparsity')
-    ax2.legend()
-    ax2.grid()
-
-def plot_metrics(model, modality='@raw_text', use_first_perp=False):
-    f = plt.figure(figsize=(12,5))
-    ax1 = f.add_subplot(121)
-    ax2 = f.add_subplot(122)
-    if use_first_perp:
-        ax1.plot(model.score_tracker["perplexity_{}".format(modality)].value)
-    else:
-        ax1.plot(range(1, model.num_phi_updates),
-                 model.score_tracker["perplexity_{}".format(modality)].value[1:])
-    ax1.set_title('perplexity')
-    ax1.grid()
-    ax2.plot(model.score_tracker["theta_sparsity"].value, label='$\\Theta$')
-    ax2.plot(model.score_tracker["phi_{}_sparsity".format(modality)].value, label='$\\Phi$')
-
-    ax1_1 = ax1.twinx()
-    ax1_1.plot(model.score_tracker["topic_kernel_@raw_text"].average_purity, 'g')
-    ax1_1.set_ylabel('Purity', color='tab:green')
-    ax1_1.tick_params(axis='y', labelcolor='tab:green')
-
-    ax2_2 = ax2.twinx()
-    ax2_2.plot(model.score_tracker["topic_kernel_@raw_text"].average_contrast, 'r')
-    ax2_2.set_ylabel('Contrast', color='tab:red')
-    ax2_2.tick_params(axis='y', labelcolor='tab:red')
-
-    f.tight_layout()  # otherwise the right y-label is slightly clipped
-    ax2.set_title('$\\Phi$ and $\\Theta$ sparsity')
-    ax2.legend()
-    ax2.grid()
 
 def print_top_terms(model, modality='@raw_text', indexes=False):
     if not indexes:

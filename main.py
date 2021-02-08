@@ -6,7 +6,6 @@ import time
 # from time import sleep
 
 import artm
-import database
 from datetime import datetime
 from django.core.serializers.json import DjangoJSONEncoder
 # from nltk import bigrams
@@ -50,7 +49,7 @@ back_topics = ['topic {}'.format(i) for i in range(num_topics - num_background_t
 # model.dump_artm_model('data/model100')
 
 def h_pubs():
-    pubs = database.getPubs()
+    pubs = utils.get_pubs()
     # ['id public name']
     print('Все пабы: ', pubs)
     for dpub in tqdm(pubs):
@@ -58,7 +57,6 @@ def h_pubs():
         posts = vkapi.get_posts(-int(pub_id), 100)
         pub_title = ' '.join(dpub.split()[1:])
         print(pub_title)
-        # print('Сейчас буду посты обробатывать и выдавать')
         for i, post in tqdm(enumerate(posts)): # Этот цикл будет отвечать за поиск по постам
             raw_text = post['text']
             date = utils.UnixToHumanity(post['unix_date'])
@@ -84,7 +82,6 @@ def h_pubs():
             except: # no text
                 tags = ['Uncertain']
             
-            # info = vk_api.groups.getById(pub_id, v="5.126")[0]
             dictionary = {
                 # 'title': ,
                 'description': raw_text,
@@ -92,7 +89,6 @@ def h_pubs():
                 'start_time': utils.get_date(raw_text, date_to_replace_year=date),
                 # 'end_time': utils.get_date(raw_text, date_to_replace_year=date),
                 'event_img_url': post['event_img'],
-                'n': post['n'], 
                 'source_url': 'https://vk.com/wall-' + pub_id + '_' + str(post['post_id']),
                 'tags': tags,
                 'channel_data': {
@@ -108,9 +104,8 @@ def h_pubs():
             jsoned_data = json.dumps(dictionary, cls=DjangoJSONEncoder) # , ensure_ascii=False)
             # requests.post('http://rishel.pythonanywhere.com/events/add', data=jsoned_data)
 
-        print('Закончил поиск по стенам \n')
+        print('Finished wall search.\n')
 
 while True:
     h_pubs()
-    # database.add(all, text, topic_probs)
 

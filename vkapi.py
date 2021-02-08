@@ -2,16 +2,15 @@ import vk
 from time import sleep
 import tqdm
 import numpy as np
-import database
 
-token ='cdf1bc50a691a9419e316bb9e47d018c497597e27c43edd7af1f66b184c2025301376c746d0ff9d9f77fb'
-session2 = vk.Session(token)
-vk_api2 = vk.API(session2)
-print('Authorized')
+#token ='cdf1bc50a691a9419e316bb9e47d018c497597e27c43edd7af1f66b184c2025301376c746d0ff9d9f77fb'
+#session2 = vk.Session(token)
+#vk_api2 = vk.API(session2)
+#print('Authorized')
 
 login = '89778568689'
 password = 'filomsk123'
-app_id = 674165
+app_id = 6741650
 
 session = vk.AuthSession(app_id, login, password, scope='messages, friends, wall, groups')
 vk_api = vk.API(session)
@@ -52,6 +51,8 @@ def get_posts(group_id, count=1, filter="all"):
                         n = len(p['attachments'])
                         if n == 1:
                             r['event_img'] = p['attachments'][-1]['photo']['sizes'][-1]['url']
+                        else:
+                            r['event_img'] = ''
                     except:
                         r['event_img'] = ''
                     r['post_id'] = p['id']
