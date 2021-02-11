@@ -3,7 +3,7 @@ import json
 import re
 import requests
 import time
-# from time import sleep
+from time import sleep
 
 import artm
 from datetime import datetime
@@ -97,15 +97,17 @@ def h_pubs():
                     'source_url': 'https://vk.com/club' + pub_id,
                 },
             }
-            print(dictionary)
-            print('-'*10)
-            if i > 2:
-                break # exit()
+            #print(dictionary)
+            #print('-'*10)
+            #if i > 2:
+            #    break # exit()
             jsoned_data = json.dumps(dictionary, cls=DjangoJSONEncoder) # , ensure_ascii=False)
-            # requests.post('http://rishel.pythonanywhere.com/events/add', data=jsoned_data)
+            requests.post('http://rishel.pythonanywhere.com/events/add', data=jsoned_data)
 
         print('Finished wall search.\n')
 
 while True:
     h_pubs()
+    sleep(3600)
+    
 
