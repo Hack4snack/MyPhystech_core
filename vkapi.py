@@ -24,7 +24,7 @@ def get_posts(group_id, count=1):
     number_posts = 0
     offset = 100
     try:
-        vposts = vk_api.wall.get(owner_id=-group_id, count=count, offset=20, v='5.74')
+        vposts = vk_api.wall.get(owner_id=-group_id, count=count, offset=0, v='5.74')
         info = vk_api.groups.getById(group_ids=abs(group_id), v="5.126")[0]
         max_number_posts = vposts["count"]
         print('Begin parsing', max_number_posts, 'posts')
