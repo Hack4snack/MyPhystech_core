@@ -8,6 +8,7 @@ import numpy as np
 import pymorphy2
 import re
 import time
+from time import mktime
 
 lc = artm.messages.ConfigureLoggingArgs()
 lc.minloglevel = 3
@@ -86,7 +87,7 @@ def get_date(string, date_to_replace_year):
         if 'month' in parsed_string[0].fact.as_json.keys() and 'day' in parsed_string[0].fact.as_json.keys():
             if 'year' in parsed_string[0].fact.as_json.keys():
                 try:
-                    return datetime(
+                   date = datetime(
                         year=parsed_string[0].fact.as_json['year'],
                         month=parsed_string[0].fact.as_json['month'],
                         day=parsed_string[0].fact.as_json['day']
@@ -95,8 +96,8 @@ def get_date(string, date_to_replace_year):
                     return None
             else:
                 try:
-                    return datetime(
-                        year=2020, month=parsed_string[0].fact.as_json['month'],
+                    date = datetime(
+                        year=date_to_replace_year.year, month=parsed_string[0].fact.as_json['month'],
                         day=parsed_string[0].fact.as_json['day']
                     )
                 except:
@@ -105,6 +106,13 @@ def get_date(string, date_to_replace_year):
             return None
     else:
         return None
+    try:
+        date_correctness = date.year < 2021
+    except:
+        return None
+    if date.year < 2021:
+        return None
+    return date
 
 def get_location(text):
     # TODO
@@ -127,10 +135,12 @@ def get_location(text):
     elif 'Концертн' in text:
         return 'КЗ'
 
-def get_pubs():
-    with open('data/pubs.txt', "r") as f:
-        data = f.read().split("\n")
-    return data
+def get_pubs(pubs_path='data/pubs.txt'):
+    data = []
+    with open(pubs_path, "r") as f:
+        for line in f.readlines():
+            data.append(line.rstrip())
+    return data 
 
 def probs2tags(probs):
     tags = []
@@ -142,7 +152,7 @@ def sentence_to_words(sentence):
     morph = pymorphy2.MorphAnalyzer()
     output = []
     for token in gensim.utils.simple_preprocess(
-            str(sentence.replace('\[club\\d*\\|', '').replace(']', '')),
+            str(sentence.replace('\\[club\\d*\\|', '').replace(']', '')),
             deacc=True
         ):  # deacc=True removes punctuations
         if token in stops:
@@ -152,7 +162,8 @@ def sentence_to_words(sentence):
     return ' '.join(output).replace('мфть', 'мфти').replace('фак', 'факи').replace('фбмфа', 'фбмф').replace('фоий', 'фойе').replace('фпмить', 'фпми')
 
 def UnixToHumanity(date):
-        return time.strftime("%a, %d %b %Y %H:%M:%S", time.localtime(date))
+    #t = time.strftime("%a, %d %b %Y %H:%M:%S", time.localtime(date))
+    return datetime.fromtimestamp(mktime(time.localtime(date)))
 
 def _to_vw_format(doc_index, document, bigramm):
     if bigramm:
