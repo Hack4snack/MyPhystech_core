@@ -10,7 +10,8 @@ from IPython.core.debugger import set_trace
 #vk_api2 = vk.API(session2)
 #print('Authorized')
 
-login = '89778568689'
+#login = '89778568689'
+login = '79384694498'
 password = 'filomsk123'
 app_id = 6741650
 

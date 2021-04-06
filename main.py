@@ -53,10 +53,11 @@ def h_pubs():
     pubs = utils.get_pubs() # ['id public name']
     print('Все пабы: ', pubs)
     for dpub in tqdm(pubs, position=0, leave=True):
+    #for dpub in pubs:
         pub_id = dpub.split()[0]
         posts = vkapi.get_posts(int(pub_id), 100)
         pub_title = ' '.join(dpub.split()[1:])
-        print(pub_title)
+        print('pub: ', pub_title)
         for i, post in enumerate(posts):
             raw_text = demoji.replace(post['text'])
             if len(raw_text.split()) <= 7:
@@ -79,7 +80,6 @@ def h_pubs():
                             tags.append(utils.topic_id2tag[j])
                     if not tags:
                         tags = ['Uncertain']
-                    continue
                 except:
                     # no text
                     tags = ['Uncertain']
@@ -104,12 +104,13 @@ def h_pubs():
                 },
             }
             #print(dictionary)
-            #print('-' * 10)
+            #print('-' * 10, end='\n')
             #if i > 10:
             #    break
+            #break
             jsoned_data = json.dumps(dictionary, cls=DjangoJSONEncoder) # .encode('utf-8') # , ensure_ascii=False).encode('utf-8')
             r = requests.post('http://rishel.pythonanywhere.com/events/add', data=jsoned_data)
-            print(r)
+            #print(type(r), r)
 
         print('Finished wall search.\n')
 
