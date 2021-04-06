@@ -14,6 +14,7 @@ pip install vk
 pip install natasha==0.10.0
 pip install gensim==3.8.3
 pip install yargy==0.12.0
+pip install rutimeparser
 
 # install BigARTM
 apt-get install git build-essential libboost-all-dev cmake
