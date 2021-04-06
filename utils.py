@@ -7,8 +7,11 @@ from natasha import DatesExtractor
 import numpy as np
 import pymorphy2
 import re
+from rutimeparser import parse
 import time
 from time import mktime
+
+from IPython.core.debugger import set_trace
 
 lc = artm.messages.ConfigureLoggingArgs()
 lc.minloglevel = 3
@@ -112,6 +115,17 @@ def get_date(string, date_to_replace_year):
         return None
     if date.year < 2021:
         return None
+
+    # time extraction
+    try:
+        date_with_time = parse(string)
+    except:
+        date = date.replace(hour=10, minute=30)
+        return date
+    if date_with_time.hour:
+        date = date.replace(hour=date_with_time.hour)
+    if date_with_time.minute:
+        date = date.replace(minute=date_with_time.minute)
     return date
 
 def get_location(text):
