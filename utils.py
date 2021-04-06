@@ -122,11 +122,15 @@ def get_date(string, date_to_replace_year):
     except:
         date = date.replace(hour=10, minute=30)
         return date
-    if date_with_time.hour:
+    try:
         date = date.replace(hour=date_with_time.hour)
-    if date_with_time.minute:
+    except:
+        date = date.replace(hour=10, minute=30)
+        return date
+    try:
         date = date.replace(minute=date_with_time.minute)
-    return date
+    except:
+        return date
 
 def get_location(text):
     # TODO
